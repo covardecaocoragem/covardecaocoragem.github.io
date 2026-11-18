@@ -5,7 +5,8 @@
    cover: image shown on cards, e.g. "assets/img/hearth.png"
    images: extra screenshots / renders shown as a gallery (click = fullscreen)
    links: any buttons, e.g. {label:"Itch.io",url:"..."}
-   featured: true = shown in the big "Featured" scroller on Home
+   hero: optional wide image (16:9, e.g. 1920x1080) for the full-screen Home panel; falls back to cover
+   featured: true = shown first on Home
    game  extras: video ("youtube:VIDEO_ID" or "assets/img/trailer.mp4"), webbuild ("assets/builds/hearth/index.html"), ratio ("16/9")
    model extras: model ("assets/models/sumo.fbx" or .glb)  */
 const SITE={

@@ -1,25 +1,23 @@
 const A=document.getElementById("app"),TYPES={game:"Games",model:"3D models",asset:"2D assets"};
 const page=document.body.dataset.page;
 function chrome(){
- const L=[["index.html","Home","home"],["projects.html","Projects","projects"],["about.html","About","about"]];
- document.body.insertAdjacentHTML("afterbegin",`<nav><div class="wrap"><a class="logo" href="index.html">${SITE.name}</a>${L.map(([h,t,p])=>`<a class="l ${page==p||(page=="item"&&p=="projects")?"on":""}" href="${h}">${t}</a>`).join("")}</div></nav>`);
+ const L=[["./","Home","home"],["projects.html","Projects","projects"],["about.html","About","about"]];
+ document.body.insertAdjacentHTML("afterbegin",`<nav><div class="wrap"><a class="logo" href="./">${SITE.name}</a>${L.map(([h,t,p])=>`<a class="l ${page==p||(page=="item"&&p=="projects")?"on":""}" href="${h}">${t}</a>`).join("")}</div></nav>`);
  document.body.insertAdjacentHTML("beforeend",`<footer><div class="wrap">© ${new Date().getFullYear()} ${SITE.name} · ${SITE.links.map(l=>`<a href="${l.url}">${l.label}</a>`).join(" · ")}</div></footer>`);
 }
 const card=i=>`<a class="card" href="item.html?id=${i.id}"><div class="cov">${i.title[0]}${i.cover?`<img loading="lazy" src="${i.cover}" alt="" onerror="this.remove()">`:""}</div><h3>${i.title}</h3><p class="d">${i.desc||""}</p><div class="m">${i.tag||""}</div>${i.webbuild?'<span class="b">Play in browser</span>':""}</a>`;
 const section=(n,l,c="")=>`<div class="sh"><h2>${n}</h2><span><button aria-label="Scroll left" data-d="-1">‹</button> <button aria-label="Scroll right" data-d="1">›</button></span></div><div class="row ${c}">${l.map(card).join("")}</div>`;
 const ofType=t=>ITEMS.filter(x=>x.type==t);
+const cta=i=>i.type=="game"?(i.webbuild?"Play in browser":"View game"):i.type=="model"?"View in 3D":"View assets";
+const pan=i=>{const im=i.hero||i.cover;return `<section class="pan"><div class="bg">${i.title[0]}${im?`<img src="${im}" alt="" loading="lazy" onerror="this.remove()">`:""}</div><div class="tx"><div class="m">${TYPES[i.type]}${i.tag?" / "+i.tag:""}</div><h2>${i.title}</h2><p>${i.desc||""}</p><a class="btn" href="item.html?id=${i.id}">${cta(i)}</a></div></section>`};
 
 function home(){
- const f=ITEMS.filter(x=>x.featured);
- A.innerHTML=`<div class="hero">${SITE.banner?`<img src="${SITE.banner}" alt="${SITE.name}">`:`<h1>zambal<b>dev</b></h1>`}<p>${SITE.tagline}</p></div>`
-  +(f.length?section("Featured",f,"big"):"")
-  +Object.entries(TYPES).map(([t,n])=>ofType(t).length?section(n,ofType(t)):"").join("");
+ document.documentElement.classList.add("snap");A.classList.add("full");
+ const all=[...ITEMS.filter(x=>x.featured),...ITEMS.filter(x=>!x.featured)];
+ A.innerHTML=`<section class="pan top"><div class="hero">${SITE.banner?`<img src="${SITE.banner}" alt="${SITE.name}">`:`<h1>zambal<b>dev</b></h1>`}<p>${SITE.tagline}. Scroll down to see my projects.</p></div></section>`+all.map(pan).join("");
 }
 function projects(){
- const draw=t=>{$g.innerHTML=ITEMS.filter(i=>t=="all"||i.type==t).map(card).join("")};
- A.innerHTML=`<h1 class="t">Projects</h1><div class="chips">${[["all","All"],...Object.entries(TYPES)].map(([k,n])=>`<button data-f="${k}" class="${k=="all"?"on":""}">${n}</button>`).join("")}</div><div class="grid" id="g"></div>`;
- const $g=document.getElementById("g");draw("all");
- A.querySelector(".chips").onclick=e=>{const b=e.target.closest("button");if(!b)return;A.querySelectorAll(".chips button").forEach(x=>x.classList.toggle("on",x==b));draw(b.dataset.f)};
+ A.innerHTML=`<h1 class="t">Projects</h1>`+Object.entries(TYPES).map(([t,n])=>ofType(t).length?section(n,ofType(t)):"").join("");
 }
 function about(){
  A.innerHTML=`<h1 class="t">About</h1><div class="prose">${SITE.about.map(p=>`<p>${p}</p>`).join("")}</div><h2 class="sh">Tools</h2><div class="chips">${SITE.skills.map(s=>`<span class="b">${s}</span>`).join("")}</div><h2 class="sh">Find me</h2>${SITE.links.map(l=>`<a class="btn" href="${l.url}">${l.label}</a>`).join("")}`;
