@@ -11,14 +11,14 @@
    model extras: model ("assets/models/sumo.fbx" or .glb)  */
 const SITE={
   name:"zambaldev",
-  banner:"",               // optional: "assets/img/banner.png" replaces the big text logo
+  banner:"assets/img/banner.png",
   tagline:"Unity game developer (C#) — Bristol",
   links:[{label:"itch.io",url:"https://zambaldev.itch.io/"},{label:"GitHub",url:"https://github.com/covardecaocoragem"},{label:"YouTube",url:"https://www.youtube.com/@SEUCANAL"},{label:"Email",url:"mailto:SEUEMAIL@exemplo.com"}],
   about:["I’m a game development student focused on building clean, playable Unity prototypes.","I enjoy gameplay systems and polishing the feel of controls. I also model and animate my own characters."],
   skills:["Unity","C#","Blender","Gameplay systems","UI","3D modelling"]
 };
 const ITEMS=[
- {id:"hearth",type:"game",title:"Hearth",tag:"Survival",desc:"Short description of Hearth.",cover:"assets/img/hearth.png",featured:true,
+ {id:"hearth",type:"game",title:"Hearth",tag:"Survival",desc:"Keep the fire going, survive",cover:"assets/img/hearth.png",featured:true,
   video:"",webbuild:"assets/builds/hearth/index.html",ratio:"16/9",
   about:"Longer description: what the game is, what you built (systems, UI, controls) and what you learned.",
   images:[],links:[{label:"Play on itch.io",url:"https://zambaldev.itch.io/"},{label:"Code",url:"https://github.com/covardecaocoragem"}]},
