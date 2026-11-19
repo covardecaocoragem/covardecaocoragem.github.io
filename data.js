@@ -13,7 +13,7 @@ const SITE={
   name:"zambaldev",
   banner:"assets/img/banner.png",
   tagline:"Unity game developer (C#) — Bristol",
-  links:[{label:"itch.io",url:"https://zambaldev.itch.io/"},{label:"GitHub",url:"https://github.com/covardecaocoragem"},{label:"YouTube",url:"https://www.youtube.com/@SEUCANAL"},{label:"Email",url:"mailto:SEUEMAIL@exemplo.com"}],
+  links:[{label:"itch.io",url:"https://zambaldev.itch.io/"},{label:"GitHub",url:"https://github.com/covardecaocoragem"},{label:"YouTube",url:"https://www.youtube.com/@SEUCANAL"},{label:"Email",url:"mailto:ukfelipelopes@gmail.com"}],
   about:["I’m a game development student focused on building clean, playable Unity prototypes.","I enjoy gameplay systems and polishing the feel of controls. I also model and animate my own characters."],
   skills:["Unity","C#","Blender","Gameplay systems","UI","3D modelling"]
 };
