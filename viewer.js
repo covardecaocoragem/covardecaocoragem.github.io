@@ -16,7 +16,7 @@ export function mount(box,url,opt={}){
   const m=g.scene||g;s.add(m);
   m.traverse(o=>{if(!o.isMesh)return;o.frustumCulled=false;
    const f=x=>{if(!x)return x;const cut=x.transparent||!!x.alphaMap;
-    if(!x.isMeshStandardMaterial)x=new THREE.MeshStandardMaterial({name:x.name,color:x.color,map:x.map,alphaMap:x.alphaMap,aoMap:x.aoMap,normalMap:x.normalMap,emissive:x.emissive,emissiveMap:x.emissiveMap,side:x.side,vertexColors:x.vertexColors,roughness:.7,metalness:0}); // FBX arrives as shiny Phong: convert to PBR
+    if(!x.isMeshStandardMaterial)x=new THREE.MeshStandardMaterial({name:x.name,color:x.color,map:x.map,alphaMap:x.alphaMap,aoMap:x.aoMap,normalMap:x.normalMap,side:x.side,vertexColors:x.vertexColors,roughness:.7,metalness:0}); // FBX arrives as shiny Phong: convert to PBR
     if(opt.roughness!=null){x.roughness=opt.roughness;x.roughnessMap=null}
     if(opt.metalness!=null){x.metalness=opt.metalness;x.metalnessMap=null}
     if(x.map)x.map.colorSpace=THREE.SRGBColorSpace;
