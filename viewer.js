@@ -14,7 +14,9 @@ export function mount(box,url){
  const ext=url.split(".").pop().toLowerCase();
  (ext=="fbx"?new FBXLoader():new GLTFLoader()).load(url,g=>{
   const m=g.scene||g;s.add(m);
-  const bb=new THREE.Box3().setFromObject(m),sz=bb.getSize(new THREE.Vector3()).length();
+  m.traverse(o=>{if(!o.isMesh)return;o.frustumCulled=false;[].concat(o.material).forEach(x=>{if(!x)return;if(x.map){x.map.colorSpace=THREE.SRGBColorSpace;x.alphaTest=.5;if(x.transparent){x.transparent=false;x.depthWrite=true}}x.needsUpdate=true})});
+  m.updateMatrixWorld(true);
+  const bb=new THREE.Box3().setFromObject(m,true),sz=bb.getSize(new THREE.Vector3()).length();
   m.position.sub(bb.getCenter(new THREE.Vector3()));          // centre at origin
   const k=3/sz;m.scale.multiplyScalar(k);m.position.multiplyScalar(k); // auto-fit: any export scale works
   const home=()=>{cam.position.set(1.6,.9,2.6);c.target.set(0,0,0);c.update()};home();
