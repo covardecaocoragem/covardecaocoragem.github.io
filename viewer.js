@@ -2,7 +2,7 @@ import * as THREE from "three";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {FBXLoader} from "three/addons/loaders/FBXLoader.js";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
-export function mount(box,url){
+export function mount(box,url,opt={}){
  box.innerHTML='<span style="color:#8d8d8d">Loading model…</span>';
  const r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,2));
  const s=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,.1,1000);
@@ -14,7 +14,14 @@ export function mount(box,url){
  const ext=url.split(".").pop().toLowerCase();
  (ext=="fbx"?new FBXLoader():new GLTFLoader()).load(url,g=>{
   const m=g.scene||g;s.add(m);
-  m.traverse(o=>{if(!o.isMesh)return;o.frustumCulled=false;[].concat(o.material).forEach(x=>{if(!x)return;if(x.map){x.map.colorSpace=THREE.SRGBColorSpace;x.alphaTest=.5;if(x.transparent){x.transparent=false;x.depthWrite=true}}x.needsUpdate=true})});
+  m.traverse(o=>{if(!o.isMesh)return;o.frustumCulled=false;
+   const f=x=>{if(!x)return x;
+    if(!x.isMeshStandardMaterial)x=new THREE.MeshStandardMaterial({name:x.name,color:x.color,map:x.map,normalMap:x.normalMap,emissive:x.emissive,emissiveMap:x.emissiveMap,transparent:x.transparent,opacity:x.opacity,roughness:.7,metalness:0}); // FBX arrives as shiny Phong: convert to PBR
+    if(opt.roughness!=null){x.roughness=opt.roughness;x.roughnessMap=null}
+    if(opt.metalness!=null){x.metalness=opt.metalness;x.metalnessMap=null}
+    if(x.map){x.map.colorSpace=THREE.SRGBColorSpace;x.alphaTest=.5;if(x.transparent){x.transparent=false;x.depthWrite=true}}
+    x.needsUpdate=true;return x};
+   o.material=Array.isArray(o.material)?o.material.map(f):f(o.material)});
   m.updateMatrixWorld(true);
   const bb=new THREE.Box3().setFromObject(m,true),sz=bb.getSize(new THREE.Vector3()).length();
   m.position.sub(bb.getCenter(new THREE.Vector3()));          // centre at origin
