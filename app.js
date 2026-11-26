@@ -31,7 +31,7 @@ function item(){
  if(i.video)v+=`<h2 class="sh">Video</h2><div class="view">${i.video.startsWith("youtube:")?`<iframe src="https://www.youtube.com/embed/${i.video.slice(8)}" allowfullscreen></iframe>`:`<video src="${i.video}" controls></video>`}</div>`;
  if(i.webbuild)v+=`<h2 class="sh">Play</h2><div class="view" id="play" style="aspect-ratio:${i.ratio||"16/9"}"><button class="btn" id="go">Play in browser</button></div>`;
  A.innerHTML=`<h1 class="t">${i.title}</h1><div class="m" style="color:var(--dim)">${TYPES[i.type]}${i.tag?" / "+i.tag:""}</div>${(i.links||[]).map(l=>`<a class="btn" href="${l.url}">${l.label}</a>`).join("")}${v}${i.about?`<p class="prose">${i.about}</p>`:""}${i.images?.length?`<h2 class="sh">${i.type=="model"?"Renders":"Gallery"}</h2><div class="gal">${i.images.map(s=>`<img loading="lazy" src="${s}" alt="">`).join("")}</div>`:""}`;
- if(i.type=="model")import("./viewer.js?v=7").then(m=>m.mount(document.getElementById("v3d"),i.model,i));
+ if(i.type=="model")import("./viewer.js?v=8").then(m=>m.mount(document.getElementById("v3d"),i.model,i));
  const go=document.getElementById("go");
  if(go)go.onclick=()=>{document.getElementById("play").innerHTML=`<iframe src="${i.webbuild}" allowfullscreen allow="fullscreen;autoplay"></iframe>`};
 }

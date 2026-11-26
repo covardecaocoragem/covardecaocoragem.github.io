@@ -3,6 +3,10 @@ import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {FBXLoader} from "three/addons/loaders/FBXLoader.js";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 import {TGALoader} from "three/addons/loaders/TGALoader.js";
+// paints a texture's alpha in one flat colour (for baked hair that is black + alpha)
+function tinted(src,tint){const cv=document.createElement("canvas"),t=new THREE.CanvasTexture(cv),im=new Image();
+ im.onload=()=>{cv.width=im.width;cv.height=im.height;const g=cv.getContext("2d");g.drawImage(im,0,0);g.globalCompositeOperation="source-in";g.fillStyle=tint;g.fillRect(0,0,cv.width,cv.height);t.needsUpdate=true};
+ im.onerror=()=>console.warn("[viewer] texture not found:",src);im.src=src;return t}
 export function mount(box,url,opt={}){
  box.innerHTML='<span style="color:#8d8d8d">Loading model…</span>';
  const r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -20,8 +24,8 @@ export function mount(box,url,opt={}){
   m.traverse(o=>{if(!o.isMesh)return;o.frustumCulled=false;[].concat(o.material).forEach(x=>{if(!x)return;
    console.log("[viewer] mesh:",o.name,"| material:",x.name);
    const k=Object.keys(T).find(k=>(x.name+" "+o.name).toLowerCase().includes(k.toLowerCase()));
-   if(k){x.map=new THREE.TextureLoader().load(T[k],undefined,undefined,()=>console.warn("[viewer] texture not found:",T[k]));x.color.set(0xffffff);x.transparent=false;x.depthWrite=true}
-   if(x.map){x.map.colorSpace=THREE.SRGBColorSpace;x.alphaTest=.5;if(x.transparent){x.transparent=false;x.depthWrite=true}}x.needsUpdate=true})});
+   if(k){const c=T[k],src=c.src||c;x.map=c.tint?tinted(src,c.tint):new THREE.TextureLoader().load(src,undefined,undefined,()=>console.warn("[viewer] texture not found:",src));x.color.set(0xffffff);x.transparent=false;x.depthWrite=true}
+   if(x.map){x.map.colorSpace=THREE.SRGBColorSpace;x.alphaTest=.1;x.alphaToCoverage=true;if(x.transparent){x.transparent=false;x.depthWrite=true}}x.needsUpdate=true})});
   m.updateMatrixWorld(true);
   const bb=new THREE.Box3().setFromObject(m,true),sz=bb.getSize(new THREE.Vector3()).length();
   m.position.sub(bb.getCenter(new THREE.Vector3()));          // centre at origin
