@@ -58,7 +58,7 @@ function item(){
 
  // Updated version to avoid browser cache
  if(i.type=="model"){
-  import("./viewer.js?v=9").then(m=>m.mount(document.getElementById("v3d"),i.model,i));
+  import("./viewer.js?v=10").then(m=>m.mount(document.getElementById("v3d"),i.model,i));
  }
 
  const go=document.getElementById("go");
