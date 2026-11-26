@@ -6,8 +6,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { TGALoader } from "three/addons/loaders/TGALoader.js";
 
 export function mount(box, url) {
-  box.innerHTML =
-    '<span style="color:#8d8d8d">Loading model…</span>';
+  box.innerHTML = '<span style="color:#8d8d8d">Loading model…</span>';
 
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -15,17 +14,11 @@ export function mount(box, url) {
   });
 
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 100000);
 
-  const camera = new THREE.PerspectiveCamera(
-    40, 1, 0.1, 1000
-  );
-
-  scene.add(
-    new THREE.HemisphereLight(0xffffff, 0x2a1840, 1.8)
-  );
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x2a1840, 1.8));
 
   const light = new THREE.DirectionalLight(0xffffff, 2.4);
   light.position.set(3, 5, 4);
@@ -36,70 +29,112 @@ export function mount(box, url) {
   controls.autoRotate = true;
   controls.autoRotateSpeed = 2;
 
-  const resize = () => {
-    const w = box.clientWidth;
-    const h = box.clientHeight;
+  let model;
+  let modelRadius = 1;
 
-    if (!w || !h) return;
+  function fitCamera() {
+    if (!model) return;
 
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
+    const aspect = camera.aspect || 1;
+    const verticalFov = THREE.MathUtils.degToRad(camera.fov);
+    const horizontalFov = 2 * Math.atan(
+      Math.tan(verticalFov / 2) * aspect
+    );
+
+    const limitingFov = Math.min(verticalFov, horizontalFov);
+
+    // Extra space around the model so it doesn't start zoomed in.
+    const distance =
+      (modelRadius / Math.sin(limitingFov / 2)) * 1.35;
+
+    const direction = new THREE.Vector3(1, 0.45, 1).normalize();
+
+    camera.position.copy(direction.multiplyScalar(distance));
+    camera.near = Math.max(modelRadius / 1000, 0.001);
+    camera.far = modelRadius * 100;
     camera.updateProjectionMatrix();
-  };
+
+    controls.target.set(0, 0, 0);
+    controls.minDistance = modelRadius * 0.15;
+    controls.maxDistance = modelRadius * 10;
+    controls.update();
+  }
+
+  function resize() {
+    const width = box.clientWidth;
+    const height = box.clientHeight;
+
+    if (!width || !height) return;
+
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
+    if (model) fitCamera();
+  }
 
   new ResizeObserver(resize).observe(box);
-
-  const extension = url.split(".").pop().toLowerCase();
 
   const manager = new THREE.LoadingManager();
   manager.addHandler(/\.tga$/i, new TGALoader(manager));
 
+  const extension = url.split(".").pop().toLowerCase();
   const loader = extension === "fbx"
     ? new FBXLoader(manager)
     : new GLTFLoader();
 
   loader.load(
     url,
-
     (loaded) => {
-      const model = loaded.scene || loaded;
-
-      // Keep the loaded meshes and materials unchanged.
-      model.traverse((object) => {
-        if (object.isMesh) {
-          object.frustumCulled = false;
-        }
-      });
-
+      model = loaded.scene || loaded;
       scene.add(model);
 
-      // Centre and scale the model to fit the viewer.
+      // Do not modify the FBX materials or their transparency settings.
+      model.traverse((object) => {
+        if (!object.isMesh) return;
+
+        object.frustumCulled = false;
+
+        const materials = Array.isArray(object.material)
+          ? object.material
+          : [object.material];
+
+        materials.forEach((material) => {
+          if (!material) return;
+
+          console.log("[viewer] mesh:", object.name);
+          console.log("[viewer] material:", material.name, {
+            type: material.type,
+            map: !!material.map,
+            alphaMap: !!material.alphaMap,
+            transparent: material.transparent,
+            opacity: material.opacity,
+            alphaTest: material.alphaTest
+          });
+        });
+      });
+
       model.updateMatrixWorld(true);
 
+      // Centre the model without changing its original scale.
       const bounds = new THREE.Box3().setFromObject(model);
-      const size = bounds.getSize(new THREE.Vector3());
-      const centre = bounds.getCenter(new THREE.Vector3());
+      const center = bounds.getCenter(new THREE.Vector3());
 
-      model.position.sub(centre);
+      model.position.sub(center);
+      model.updateMatrixWorld(true);
 
-      const maxDimension = Math.max(size.x, size.y, size.z);
-      const scale = 3 / maxDimension;
+      const centeredBounds = new THREE.Box3().setFromObject(model);
+      const sphere = centeredBounds.getBoundingSphere(
+        new THREE.Sphere()
+      );
 
-      model.scale.multiplyScalar(scale);
-      model.position.multiplyScalar(scale);
-
-      const resetCamera = () => {
-        camera.position.set(1.6, 0.9, 2.6);
-        controls.target.set(0, 0, 0);
-        controls.update();
-      };
-
-      resetCamera();
+      modelRadius = Math.max(sphere.radius, 0.01);
 
       box.innerHTML = "";
       box.append(renderer.domElement);
 
       resize();
+      fitCamera();
 
       box.insertAdjacentHTML(
         "beforeend",
@@ -129,14 +164,18 @@ export function mount(box, url) {
           model.traverse((object) => {
             if (!object.isMesh) return;
 
-            [].concat(object.material).forEach((material) => {
-              material.wireframe = wireframe;
+            const materials = Array.isArray(object.material)
+              ? object.material
+              : [object.material];
+
+            materials.forEach((material) => {
+              if (material) material.wireframe = wireframe;
             });
           });
         }
 
         if (action === "reset") {
-          resetCamera();
+          fitCamera();
         }
       };
 
@@ -148,16 +187,13 @@ export function mount(box, url) {
 
       animate();
     },
-
     undefined,
-
     (error) => {
-      console.error("[viewer] Model loading failed:", error);
-
+      console.error("[viewer] model loading error:", error);
       box.innerHTML =
-        `<span style="color:#c084fc;padding:20px;text-align:center">
-          Couldn’t load ${url}. Check the model file and path.
-        </span>`;
+        '<span style="color:#c084fc;padding:20px">' +
+        'Couldn’t load the model. Check the model file path.' +
+        '</span>';
     }
   );
 }

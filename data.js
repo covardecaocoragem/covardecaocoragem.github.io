@@ -100,7 +100,7 @@ const ITEMS=[
   desc:"My second character.",
   cover:"assets/img/sumo.png",
   featured:true,
-  model:"assets/models/sumo.fbx",
+  model:"assets/models/sumo.glb",
   about:"Modelled in Blender. Drag to rotate, scroll to zoom.",
   images:[],
   links:[]
