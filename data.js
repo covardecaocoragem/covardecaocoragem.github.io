@@ -66,32 +66,6 @@ const ITEMS=[
   images:[],
   links:[]
  },
-
- {
-  id:"teocalli",
-  type:"game",
-  title:"Teocalli",
-  tag:"Puzzle",
-  desc:"A puzzle game.",
-  cover:"assets/img/teocalli.png",
-  video:"youtube:VIDEO_ID",
-  about:"",
-  images:[],
-  links:[]
- },
-
- {
-  id:"shinobaby",
-  type:"game",
-  title:"Shinobaby",
-  tag:"Action",
-  desc:"Baby shinobi fighting.",
-  cover:"assets/img/shinobaby.png",
-  about:"",
-  images:[],
-  links:[]
- },
-
  {
   id:"sumo",
   type:"model",
@@ -118,7 +92,30 @@ const ITEMS=[
   images:[],
   links:[]
  },
+ {
+  id:"teocalli",
+  type:"game",
+  title:"Teocalli",
+  tag:"Puzzle",
+  desc:"A puzzle game.",
+  cover:"assets/img/teocalli.png",
+  video:"youtube:VIDEO_ID",
+  about:"",
+  images:[],
+  links:[]
+ },
 
+ {
+  id:"shinobaby",
+  type:"game",
+  title:"Shinobaby",
+  tag:"Action",
+  desc:"Baby shinobi fighting.",
+  cover:"assets/img/shinobaby.png",
+  about:"",
+  images:[],
+  links:[]
+ },
  {
   id:"ui-icons",
   type:"asset",
